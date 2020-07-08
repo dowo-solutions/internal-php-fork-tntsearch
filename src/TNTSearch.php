@@ -306,17 +306,17 @@ class TNTSearch
         $searchWordlist = "SELECT * FROM wordlist WHERE term like :keyword LIMIT 1";
         $stmtWord       = $this->index->prepare($searchWordlist);
 
-        if (!$this->fuzziness) {
-            if ($this->asYouType && $isLastWord) {
-                $searchWordlist = "SELECT * FROM wordlist WHERE term like :keyword ORDER BY length(term) ASC, num_hits DESC LIMIT 1";
-                $stmtWord       = $this->index->prepare($searchWordlist);
-                $stmtWord->bindValue(':keyword', mb_strtolower($keyword)."%");
-            } else {
-                $stmtWord->bindValue(':keyword', mb_strtolower($keyword));
-            }
-            $stmtWord->execute();
-            $res = $stmtWord->fetchAll(PDO::FETCH_ASSOC);
+        if ($this->asYouType && $isLastWord) {
+            $searchWordlist = "SELECT * FROM wordlist WHERE term like :keyword ORDER BY length(term) ASC, num_hits DESC LIMIT 10";
+            $stmtWord       = $this->index->prepare($searchWordlist);
+            $stmtWord->bindValue(':keyword', mb_strtolower($keyword)."%");
         } else {
+            $stmtWord->bindValue(':keyword', mb_strtolower($keyword));
+        }
+        $stmtWord->execute();
+        $res = $stmtWord->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($this->fuzziness && !isset($res[0])) {
             return $this->fuzzySearch($keyword);
         }
         return $res;
