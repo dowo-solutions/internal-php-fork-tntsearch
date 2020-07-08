@@ -309,7 +309,7 @@ class TNTSearch
         if ($this->asYouType && $isLastWord) {
             $searchWordlist = "SELECT * FROM wordlist WHERE term like :keyword ORDER BY length(term) ASC, num_hits DESC LIMIT 10";
             $stmtWord       = $this->index->prepare($searchWordlist);
-            $stmtWord->bindValue(':keyword', mb_strtolower($keyword)."%");
+            $stmtWord->bindValue(':keyword', "%".mb_strtolower($keyword)."%");
         } else {
             $stmtWord->bindValue(':keyword', mb_strtolower($keyword));
         }
